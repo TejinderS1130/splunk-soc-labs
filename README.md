@@ -16,7 +16,7 @@ This project simulates real-world SSH authentication attacks against a Linux ser
 
 ---
 
-### SOC Workflow
+## SOC Workflow
 
 ```
 Detection → Investigation → Classification → Containment → Validation → Documentation
@@ -24,7 +24,7 @@ Detection → Investigation → Classification → Containment → Validation �
 
 ---
 
-### Technologies Used
+## Technologies Used
 
 * Splunk Enterprise (SIEM)
 * Splunk Universal Forwarder
@@ -91,14 +91,14 @@ Detection → Investigation → Classification → Containment → Validation �
 
 ## Log Ingestion & SIEM Configuration
 
-### Install Universal Forwarder
+## Install Universal Forwarder
 
 ```bash
 sudo rpm -ivh splunkforwarder-10.x.x.rpm
 sudo /opt/splunkforwarder/bin/splunk start --accept-license
 ```
 
-### Configure Forwarding
+## Configure Forwarding
 
 ```bash
 sudo /opt/splunkforwarder/bin/splunk add forward-server 192.168.192.5:9997
@@ -106,13 +106,13 @@ sudo /opt/splunkforwarder/bin/splunk add monitor /var/log/secure
 sudo /opt/splunkforwarder/bin/splunk add monitor /var/log/messages
 ```
 
-### Validate Connectivity
+## Validate Connectivity
 
 ```bash
 sudo /opt/splunkforwarder/bin/splunk list forward-server
 ```
 
-### Verification Query
+## Verification Query
 
 ```spl
 index=* source="/var/log/secure"
@@ -124,27 +124,27 @@ index=* source="/var/log/secure"
 
 ---
 
-### Attack Simulation
+## Attack Simulation
 
 ```bash
 sudo hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://192.168.64.10 -t 4
 ```
 
-### Indicators Observed
+## Indicators Observed
 
 * High-frequency login failures
 * Single account targeted (root)
 * Same source IP
 * Time-based spike
 
-### Detection Query
+## Detection Query
 
 ```spl
 source="/var/log/secure" "Failed password"
 | timechart span=10s count
 ```
 
-### MITRE ATT&CK Mapping
+## MITRE ATT&CK Mapping
 
 * **Tactic:** Credential Access
 * **Technique:** T1110 – Brute Force
@@ -156,20 +156,20 @@ source="/var/log/secure" "Failed password"
 
 ---
 
-### Attack Simulation
+## Attack Simulation
 
 ```bash
 sudo hydra -L users.txt -p Welcome123 ssh://192.168.64.10 -t 1
 ```
 
-### Indicators Observed
+## Indicators Observed
 
 * Same password reused
 * Multiple accounts targeted
 * Lower rate per user
 * Same source IP
 
-### Detection Engineering
+## Detection Engineering
 
 ```spl
 source="/var/log/secure" "Failed password"
@@ -185,7 +185,7 @@ source="/var/log/secure" "Failed password"
 * `attempts = 78`
 * `src_ip = 192.168.64.11`
 
-### MITRE ATT&CK Mapping
+## MITRE ATT&CK Mapping
 
 * **Tactic:** Credential Access
 * **Technique:** T1110 – Brute Force
@@ -193,11 +193,11 @@ source="/var/log/secure" "Failed password"
 
 ---
 
-# 🔍 Incident C — SSH Reconnaissance (T1595)
+# Incident C — SSH Reconnaissance (T1595)
 
 ---
 
-### Detection Query
+## Detection Query
 
 ```spl
 source="/var/log/secure" "Did not receive identification string"
@@ -205,7 +205,7 @@ source="/var/log/secure" "Did not receive identification string"
 | stats count by src_ip
 ```
 
-### MITRE ATT&CK Mapping
+## MITRE ATT&CK Mapping
 
 * **Tactic:** Reconnaissance
 * **Technique:** T1595 – Active Scanning
@@ -216,7 +216,7 @@ source="/var/log/secure" "Did not receive identification string"
 
 ---
 
-### SSH Jail Configuration
+## SSH Jail Configuration
 
 ```ini
 [sshd]
@@ -228,18 +228,18 @@ findtime = 300
 bantime = 600
 ```
 
-### Validation
+## Validation
 
 ```bash
 sudo fail2ban-client status sshd
 ```
 
-### Result
+## Result
 
 * Banned IP: `192.168.64.11`
 * Automated containment successful
 
-### Splunk Verification
+## Splunk Verification
 
 ```spl
 source="/var/log/secure" "fail2ban"
